@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PokePrice Identifier</title>
+    <meta charset="utf-8">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .center-top-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .spacer {
+            margin-bottom: 20px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        #cardImage {
+            width: 300px; /* Adjust the image size as needed */
+        }
+    </style>
+</head>
+<body>
+    <div class="center-top-container">
+        <h2 class="text-center">How much is it worth?</h2>
+        <label for="Name">Select the booster pack name:</label>
+        <select id="BoosterPack">
+            <option value="">Select a booster pack...</option>
+            <option value="Vivid Voltage">Vivid Voltage</option>
+            <option value="Battle Styles">Battle Styles</option>
+            <!-- Add more booster pack options as needed -->
+        </select>
+        <div class='spacer'></div>
+        <label for="ID">Enter the ID numbers:</label>
+        <input type="text" id="IDnums" name="IDnums" placeholder="018/172">
+        <div class='spacer'></div>
+        <button onclick="showCardImage()">Show Card Image</button>
+        <div id="cardImageContainer">
+            <!-- The card image will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        function showCardImage() {
+            const boosterPackName = document.getElementById("BoosterPack").value.toLowerCase();
+            const cardNumber = document.getElementById("IDnums").value.toLowerCase();
+
+            if (!boosterPackName || !cardNumber) {
+                alert("Please select a booster pack and enter the card number.");
+                return;
+            }
+
+            // Fetch card data from the PokéAPI
+            fetch(`https://api.pokemontcg.io/v2/cards?q=name:${boosterPackName} ${cardNumber}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Display the card image
+                    const cardImageContainer = document.getElementById("cardImageContainer");
+                    if (data.data.length > 0) {
+                        const cardImageUrl = data.data[0].images.large;
+                        const cardImageElement = document.createElement("img");
+                        cardImageElement.src = cardImageUrl;
+                        cardImageElement.alt = `${boosterPackName} ${cardNumber}`;
+                        cardImageElement.id = "cardImage";
+                        cardImageContainer.innerHTML = "";
+                        cardImageContainer.appendChild(cardImageElement);
+                    } else {
+                        cardImageContainer.innerHTML = "Card not found.";
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching card data:", error);
+                });
+        }
+    </script>
+</body>
+</html>
